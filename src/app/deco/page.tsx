@@ -278,6 +278,8 @@ const DecoPage = () => {
                 <Image
                   src={product.image}
                   alt={product.name}
+                  width={60}
+                  height={56}
                   className="w-full h-56 object-cover rounded-t-lg cursor-pointer"
                 />
               </Link>

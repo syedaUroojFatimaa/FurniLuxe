@@ -1,39 +1,23 @@
 "use client";
-import React from 'react'
-
-export default function page() {
-  return (
-    <div>page</div>
-  )
-}
-
-/*
-original code having errors
 import React, { useState, useEffect } from "react";
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image"
 
 const Cart = () => {
-    const [cart, setCart] = useState(() => {
-        if (typeof window !== "undefined") {
-            const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-            return storedCart.length > 0 ? storedCart : [];
-        }
-        return [];
-    });
+    const [cart, setCart] = useState<
+        { id: string; name: string; image: string; description: string; price: number; quantity: number }[]
+    >([]);
 
-    useEffect(() => {
-        if (cart.length > 0) {
-            localStorage.setItem("cart", JSON.stringify(cart));
-        }
-    }, [cart]);
-
-    const addToCart = (newProduct) => {
+    const addToCart = (newProduct: { id: string; name: string; image: string; description: string; price: number }) => {
         setCart((prevCart) => {
-            const existingProduct = prevCart.find((item) => item.id === newProduct.id);
-            if (existingProduct) {
-                return prevCart.map((item) =>
-                    item.id === newProduct.id ? { ...item, quantity: item.quantity + 1 } : item
+            if (!Array.isArray(prevCart)) return [{ ...newProduct, quantity: 1 }];
+
+            const existingIndex = prevCart.findIndex((item) => item.id === newProduct.id);
+
+            if (existingIndex !== -1) {
+                return prevCart.map((item, index) =>
+                    index === existingIndex ? { ...item, quantity: item.quantity + 1 } : item
                 );
             } else {
                 return [...prevCart, { ...newProduct, quantity: 1 }];
@@ -41,7 +25,7 @@ const Cart = () => {
         });
     };
 
-    const updateQuantity = (id, quantity) => {
+    const updateQuantity = (id: string, quantity: number) => {
         setCart((prevCart) =>
             prevCart.map((item) =>
                 item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
@@ -49,11 +33,12 @@ const Cart = () => {
         );
     };
 
-    const removeFromCart = (id) => {
+    const removeFromCart = (id: string) => {
         setCart((prevCart) => prevCart.filter((item) => item.id !== id));
     };
 
-    const subTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    // ✅ Fix: Calculate subtotal
+    const subTotal = cart.reduce((acc, product) => acc + product.price * product.quantity, 0);
 
     return (
         <div>
@@ -77,7 +62,7 @@ const Cart = () => {
                 <div className="grid gap-4">
                     {cart.map((product) => (
                         <div key={product.id} className="flex items-center gap-4 p-4 border rounded-md shadow-sm">
-                            <img src={product.image} alt={product.name} className="w-24 h-24 object-cover rounded" />
+                            <Image src={product.image} alt={product.name} width={24} height={24} className="w-24 h-24 object-cover rounded" />
                             <div className="flex-1">
                                 <h2 className="text-lg font-bold">{product.name}</h2>
                                 <p className="text-gray-600">{product.description}</p>
@@ -100,7 +85,7 @@ const Cart = () => {
                     ))}
                 </div>
                 <div className="mt-6 p-4 border-t text-slate-800">
-                    <p className="text-right text-lg font-bold">Subtotal: ${subTotal}</p>
+                    <p className="text-right text-lg font-bold">Subtotal: ${subTotal.toFixed(2)}</p>
                     <p className="text-right text-sm text-gray-500">
                         Taxes and shipping are calculated at checkout.
                     </p>
@@ -114,4 +99,3 @@ const Cart = () => {
 };
 
 export default Cart;
-*/

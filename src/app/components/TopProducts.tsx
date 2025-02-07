@@ -72,7 +72,13 @@ const TopProducts = () => {
         {products.map((product) => (
           <SwiperSlide key={product.id} className="p-4">
             <div className="border rounded-lg shadow-md bg-white relative min-h-[350px] text-center">
-              <Image src={product.image} alt={product.name} className="w-full h-56 object-cover rounded-t-lg" />
+              <Image 
+                src={product.image} 
+                alt={product.name} 
+                width={300} 
+                height={200} 
+                className="w-full h-56 object-cover rounded-t-lg"
+              />
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{product.name}</h3>
 
