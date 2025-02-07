@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import Image from "next/image";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -71,7 +72,7 @@ const TopProducts = () => {
         {products.map((product) => (
           <SwiperSlide key={product.id} className="p-4">
             <div className="border rounded-lg shadow-md bg-white relative min-h-[350px] text-center">
-              <img src={product.image} alt={product.name} className="w-full h-56 object-cover rounded-t-lg" />
+              <Image src={product.image} alt={product.name} className="w-full h-56 object-cover rounded-t-lg" />
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{product.name}</h3>
 

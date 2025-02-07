@@ -136,6 +136,7 @@ export default DecoPage;
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Star } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebookSquare, FaTwitter, FaPinterest } from "react-icons/fa";
 import { IoLogoSkype } from "react-icons/io";
@@ -274,7 +275,7 @@ const DecoPage = () => {
           {products.map((product) => (
             <div key={product.id} className="border rounded-lg shadow-md bg-white relative min-h-[350px]">
               <Link href={`/product/${product.slug}`} passHref>
-                <img
+                <Image
                   src={product.image}
                   alt={product.name}
                   className="w-full h-56 object-cover rounded-t-lg cursor-pointer"

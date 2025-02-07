@@ -1,5 +1,14 @@
-/*
 "use client";
+import React from 'react'
+
+export default function page() {
+  return (
+    <div>page</div>
+  )
+}
+
+/*
+original code having errors
 import React, { useState, useEffect } from "react";
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
 import Link from "next/link";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { FaCartPlus, FaTimes } from "react-icons/fa";
 import { Star } from "lucide-react";
 import { useParams } from "next/navigation"; // ✅ Correct import for App Router
@@ -85,7 +86,16 @@ const ProductPage = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">{product?.name}</h1>
 
       <div className="flex justify-center mb-6">
-        <img src={product?.image} alt={product?.name} className="w-64 h-64 object-cover" />
+        {product?.image && (
+          <Image 
+            src={product.image} 
+            alt={product.name} 
+            width={256} 
+            height={256} 
+            className="object-cover rounded-lg"
+            priority
+          />
+        )}
       </div>
 
       <div className="text-center mb-6">
