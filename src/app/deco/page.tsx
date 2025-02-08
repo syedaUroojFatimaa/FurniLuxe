@@ -13,7 +13,7 @@ import { useCart } from "../context/CartContext";
 
 
 interface Product {
-  _id: number;
+  _id: string;
   name: string;
   price: number;
   image: string;

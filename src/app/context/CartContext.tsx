@@ -3,14 +3,17 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 // Product type based on Sanity's data
 interface Product {
-  _id: string; // Use _id as the unique identifier
+  _id: string;
   name: string;
   price: number;
   image: string;
-  description: string;
-  rating: number | null;
   slug: string;
-  quantity?: number;
+  rating?: number | null;
+  category?: string;
+  discount?: number;
+  reviews?: number;
+  description?: string; // ✅ Allow undefined values
+  quantity?: number; // ✅ Added quantity to prevent TypeScript errors
 }
 
 // Cart context type
@@ -38,7 +41,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       if (existingProduct) {
         // If the product exists, increase its quantity
-        existingProduct.quantity = (existingProduct.quantity || 1) + 1;
+        existingProduct.quantity = (existingProduct.quantity || 0) + 1;
       } else {
         // If it's a new product, add it to the cart with quantity 1
         updatedCart.push({ ...newProduct, quantity: 1 });
@@ -51,7 +54,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const updateQuantity = (id: string, quantity: number) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item._id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        item._id === id ? { ...item, quantity: Math.max(1, quantity || 1) } : item
       )
     );
   };

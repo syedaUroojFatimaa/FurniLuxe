@@ -30,7 +30,7 @@ import { client } from "@/sanity/lib/client";
 import { useCart } from "../context/CartContext";
 
 interface Product {
-  _id: number;
+  _id: string;
   name: string;
   price: number;
   image: string;
@@ -39,7 +39,9 @@ interface Product {
   category?: string;
   discount?: number;
   reviews?: number;
+  description?: string; // Make it optional
 }
+
 
 const FurniturePage = () => {
   const { addToCart } = useCart();
@@ -50,53 +52,25 @@ const FurniturePage = () => {
   const [cartMessage, setCartMessage] = useState("");
   const [isMessageVisible, setMessageVisible] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await fetch("https://hackathon-apis.vercel.app/api/products");
-  //       if (!res.ok) throw new Error("Failed to fetch products");
-  //       const data = await res.json();
-
-  //       const productsWithRatings = data.map((product: Product) => ({
-  //         ...product,
-  //         rating: (Math.random() * 5).toFixed(1),
-  //       }));
-
-  //       setProducts(productsWithRatings);
-  //     } catch (err) {
-  //       setError((err as Error).message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
+  
   useEffect(() => {
-    // console.log("✅ Params received:", params);
-
-    // if (!params?.slug) {
-    //   console.error("❌ No slug found in URL!");
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // const slug = decodeURIComponent(params.slug as string);
-    // console.log("🔍 Extracted Slug:", slug);
 
     async function fetchProduct() {
       try {
         console.log("⏳ Fetching product from Sanity...");
         const query = `*[_type == "product"]{
-              _id,
-              name,
-              price,
-              "image": image.asset->url,
-              "slug": slug.current,
-              rating,
-              description
-            }`;
+          _id,
+          name,
+          price,
+          image,
+          slug,
+          rating,
+          category,
+          discount,
+          reviews,
+          description
+        }`;
+        
     
         const fetchedProduct = await client.fetch(query);
         console.log("🎯 Fetched Product:", fetchedProduct);
@@ -116,76 +90,18 @@ const FurniturePage = () => {
     }
     
 
-    //async function fetchProduct() {
-     // try {
-      //  console.log("⏳ Fetching product from Sanity...");
-        //const query = `*[_type == "product"]{
-          //    _id,
-            //  name,
-              //price,
-              //"image": image.asset->url,
-              //"slug": slug.current,
-              //rating,
-              //description
-            //}`;
-
-        //const fetchedProduct = await client.fetch(query);
-        //console.log("🎯 Fetched Product:", fetchedProduct);
-
-        // if (!fetchedProduct) {
-        //   console.warn(⚠ No product found for slug '${slug}');
-        // }
-
-        //setProducts(fetchedProduct);
-     // } catch (error) {
-      //  console.error("❌ Error fetching product:", error);
-      //} finally {
-        //setLoading(false);
-     // }
-    //}
-
-    
-
     fetchProduct();
   }, []);
 
-  // const handleAddToCart = (product: Product) => {
-  //   // Retrieve the current cart from localStorage
-  //   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-  //   // Check if the product already exists in the cart
-  //   const existingItemIndex = cart.findIndex((item: Product) => item.id === product.id);
-
-  //   if (existingItemIndex !== -1) {
-  //     // If the product exists, update its quantity by 1
-  //     const updatedProduct = {
-  //       ...cart[existingItemIndex],
-  //       quantity: cart[existingItemIndex].quantity + 1
-  //     };
-
-  //     // Update the product in the cart
-  //     cart[existingItemIndex] = updatedProduct;
-  //   } else {
-  //     // If the product does not exist, add it as a new item with quantity set to 1
-  //     const newProduct = { ...product, quantity: 1 };
-  //     cart.push(newProduct);
-  //   }
-
-  //   // Save the updated cart back to localStorage
-  //   localStorage.setItem("cart", JSON.stringify(cart));
-
-  //   // Show success message
-  //   setCartMessage("Item Added to Cart Successfully!");
-  //   setMessageVisible(true);
-  //   setTimeout(() => setMessageVisible(false), 3000);
-  // };
 
   const handleAddToCart = (product: Product) => {
+    console.log("Product being added:", product);
     addToCart(product);
     setCartMessage("Item Added to Cart Successfully!");
     setMessageVisible(true);
     setTimeout(() => setMessageVisible(false), 3000);
   };
+  
 
   if (loading) return <p className="text-center">Loading products...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
