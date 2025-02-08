@@ -101,7 +101,7 @@ const DecoPage = () => {
                     ))}
                   </div>
                   <span className="ml-2 pt-4 text-sm text-gray-500">
-                    {product.rating ? `${product.rating}/5` : "0/5"}
+                    {product.rating ? ${product.rating}/5 : "0/5"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center pt-4">
@@ -143,10 +143,12 @@ import { IoLogoSkype } from "react-icons/io";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { FaCartPlus, FaTimes } from "react-icons/fa";
 import { FaSearch, FaUser, FaShoppingCart } from "react-icons/fa";
+import { client } from "@/sanity/lib/client";
+import { useCart } from "../context/CartContext";
 
 
 interface Product {
-  id: number;
+  _id: number;
   name: string;
   price: number;
   image: string;
@@ -158,61 +160,152 @@ interface Product {
 }
 
 const DecoPage = () => {
+  const { addToCart } = useCart();
+
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cartMessage, setCartMessage] = useState("");
   const [isMessageVisible, setMessageVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await fetch("https://hackathon-apis.vercel.app/api/products");
+  //       if (!res.ok) throw new Error("Failed to fetch products");
+  //       const data = await res.json();
+
+  //       console.log("DATA=====>", data)
+
+  //       const productsWithRatings = data.map((product: Product) => ({
+  //         ...product,
+  //         rating: (Math.random() * 5).toFixed(1),
+  //       }));
+
+  //       setProducts(productsWithRatings);
+  //     } catch (err) {
+  //       setError((err as Error).message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+
+    useEffect(() => {
+      // console.log("✅ Params received:", params);
+  
+      // if (!params?.slug) {
+      //   console.error("❌ No slug found in URL!");
+      //   setLoading(false);
+      //   return;
+      // }
+  
+      // const slug = decodeURIComponent(params.slug as string);
+      // console.log("🔍 Extracted Slug:", slug);
+  
+
+    async function fetchProduct() {
       try {
-        const res = await fetch("https://hackathon-apis.vercel.app/api/products");
-        if (!res.ok) throw new Error("Failed to fetch products");
-        const data = await res.json();
-
-        const productsWithRatings = data.map((product: Product) => ({
+        console.log("⏳ Fetching product from Sanity...");
+        const query = `*[_type == "product"]{
+              _id,
+              name,
+              price,
+              "image": image.asset->url,
+              "slug": slug.current,
+              rating,
+              description
+            }`;
+    
+        const fetchedProduct = await client.fetch(query);
+        console.log("🎯 Fetched Product:", fetchedProduct);
+    
+        // Assign a default rating if missing
+        const productsWithDefaultRating = fetchedProduct.map((product: Product) => ({
           ...product,
-          rating: (Math.random() * 5).toFixed(1),
+          rating: product.rating ?? 3.5, // Default rating if missing
         }));
-
-        setProducts(productsWithRatings);
-      } catch (err) {
-        setError((err as Error).message);
+    
+        setProducts(productsWithDefaultRating);
+      } catch (error) {
+        console.error("❌ Error fetching product:", error);
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleAddToCart = (product: Product) => {
-    // Retrieve the current cart from localStorage
-    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    // Check if the product already exists in the cart
-    const existingItemIndex = cart.findIndex((item: Product) => item.id === product.id);
-
-    if (existingItemIndex !== -1) {
-      // If the product exists, update its quantity by 1
-      const updatedProduct = {
-        ...cart[existingItemIndex],
-        quantity: cart[existingItemIndex].quantity + 1,
-      };
-
-      // Update the product in the cart
-      cart[existingItemIndex] = updatedProduct;
-    } else {
-      // If the product does not exist, add it as a new item with quantity set to 1
-      const newProduct = { ...product, quantity: 1 };
-      cart.push(newProduct);
     }
 
-    // Save the updated cart back to localStorage
-    localStorage.setItem("cart", JSON.stringify(cart));
 
-    // Show success message
+
+      //async function fetchProduct() {
+        //try {
+         // console.log("⏳ Fetching product from Sanity...");
+          //const query = `*[_type == "product"]{
+            /*_id,
+            name,
+            price,
+            "image": image.asset->url,
+            "slug": slug.current,
+            rating,
+            description
+          }`;
+  */
+          //const fetchedProduct = await client.fetch(query);
+          //console.log("🎯 Fetched Product:", fetchedProduct);
+  
+          // if (!fetchedProduct) {
+          //   console.warn(⚠ No product found for slug '${slug}');
+          // }
+  
+          /*setProducts(fetchedProduct);
+        } catch (error) {
+          console.error("❌ Error fetching product:", error);
+        } finally {
+          setLoading(false);
+        }
+      }*/
+  
+      fetchProduct();
+    }, []);
+
+
+  // const handleAddToCart = (product: Product) => {
+  //   // Retrieve the current cart from localStorage
+  //   let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  //   // Check if the product already exists in the cart
+  //   const existingItemIndex = cart.findIndex((item: Product) => item.id === product.id);
+
+  //   if (existingItemIndex !== -1) {
+  //     // If the product exists, update its quantity by 1
+  //     const updatedProduct = {
+  //       ...cart[existingItemIndex],
+  //       quantity: cart[existingItemIndex].quantity + 1,
+  //     };
+
+  //     // Update the product in the cart
+  //     cart[existingItemIndex] = updatedProduct;
+  //   } else {
+  //     // If the product does not exist, add it as a new item with quantity set to 1
+  //     const newProduct = { ...product, quantity: 1 };
+  //     cart.push(newProduct);
+  //   }
+
+  //   // Save the updated cart back to localStorage
+  //   localStorage.setItem("cart", JSON.stringify(cart));
+
+  //   // Show success message
+  //   setCartMessage("Item Added to Cart Successfully!");
+  //   setMessageVisible(true);
+  //   setTimeout(() => setMessageVisible(false), 3000);
+  // };
+
+
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
     setCartMessage("Item Added to Cart Successfully!");
     setMessageVisible(true);
     setTimeout(() => setMessageVisible(false), 3000);
@@ -223,65 +316,24 @@ const DecoPage = () => {
 
   return (
     <div>
-       <header className="container mx-auto flex items-center justify-between py-6 px-6 md:px-12 text-blue-950">
-        {/* Logo */}
-        <h1 className="text-5xl md:text-4xl font-bold text-black ml-10">
-          Furni<span className="font-light text-blue-950">Luxe</span>
-        </h1>
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-8">
-          <Link href="/furniture" className="text-xl font-medium hover:text-blue-900 transition text-blue-950">
-            Furniture
-          </Link>
-          <Link href="/deco" className="text-xl font-medium hover:text-blue-900 transition text-blue-950">
-            Home Decor
-          </Link>
-          <Link href="/aboutus" className="text-xl font-medium hover:text-blue-900 transition text-blue-950">
-            About Us
-          </Link>
-          <Link href="/Contact" className="text-xl font-medium hover:text-blue-900 transition text-blue-950">
-            Contact
-          </Link>
-        </nav>
-
-        {/* Icons */}
-        <div className="flex gap-4 mr-4">
-          <FaSearch className="text-blue-950 cursor-pointer hover:text-blue-900" size={20} />
-          <Link href="/cart">
-            <FaShoppingCart className="text-blue-950 cursor-pointer hover:text-blue-900" size={20} />
-          </Link>
-
-          <Link href="/LogIn">
-            <p className="text-blue-950 cursor-pointer ml-2 hover:text-blue-900">
-                <ClerkProvider>
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-              </ClerkProvider>
-            </p>
-          </Link>
-        </div>
-      </header>
 
       <hr className="border-t border-gray-300 my-1 ml-6 mr-6" />
 
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-center">All Home Deco Products</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="border rounded-lg shadow-md bg-white relative min-h-[350px]">
-              <Link href={`/product/${product.slug}`} passHref>
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={60}
-                  height={56}
-                  className="w-full h-56 object-cover rounded-t-lg cursor-pointer"
-                />
+          {products?.map((product) => (
+            <div key={product._id} className="border rounded-lg shadow-md bg-white relative min-h-[350px]">
+              <Link href={`/product/${product?.slug}`} passHref>
+              <Image
+                                src={product.image}
+                                alt={product.name}
+                                width={300}
+                                height={224}
+                                className="w-full h-56 object-cover rounded-t-lg"
+                              />
+
               </Link>
               <div className="p-4">
                 <div className="flex items-center gap-2">
@@ -299,7 +351,7 @@ const DecoPage = () => {
                     ))}
                   </div>
                   <span className="ml-2 pt-4 text-sm text-gray-500">
-                    {product.rating ? `${product.rating}/5` : "0/5"}
+                    {product.rating ?`${product.rating}/5` : "0/5"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center pt-4">
