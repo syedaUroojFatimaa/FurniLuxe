@@ -12,21 +12,17 @@ export const metadata: Metadata = {
   description: "The best place for furniture and home decor.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body className={inter.className}>
-
-        <CartProvider>
-        <Navbar />
-          {children}</CartProvider>
-      </body>
-    </html>
+      <html lang="en">
+        <body className={inter.className}>
+          <CartProvider>
+            <Navbar />
+            {children}
+          </CartProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

@@ -54,7 +54,7 @@ const Checkout = () => {
           </select>
 
           <Link href="/confirm">
-            <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded w-full">
+            <button type="submit" className="bg-blue-600 text-white pt-2 py-2 px-4 rounded w-full">
               Place Order
             </button>
           </Link>
