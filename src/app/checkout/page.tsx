@@ -3,6 +3,14 @@ import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import Link from "next/link";
 
+// Define Product type to avoid TypeScript errors
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  quantity?: number; // Optional quantity
+};
+
 const Checkout = () => {
   const { cart, subTotal } = useCart();
   const [formData, setFormData] = useState({
@@ -14,11 +22,12 @@ const Checkout = () => {
     paymentMethod: "creditCard",
   });
 
-  const handleChange = (e) => {
+  // Ensure event is properly typed
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     alert("Order placed successfully!");
   };
@@ -43,8 +52,12 @@ const Checkout = () => {
             <option value="paypal">PayPal</option>
             <option value="cod">Cash on Delivery</option>
           </select>
-<Link href="/confirm">          <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded w-full">Place Order</button>
-</Link>
+
+          <Link href="/confirm">
+            <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded w-full">
+              Place Order
+            </button>
+          </Link>
         </form>
 
         {/* Order Summary */}
@@ -54,10 +67,12 @@ const Checkout = () => {
             {cart.length === 0 ? (
               <p className="text-gray-500">Your cart is empty.</p>
             ) : (
-              cart.map((product) => (
+              cart.map((product: Product) => (
                 <div key={product._id} className="flex justify-between">
-                  <p>{product.name} x {product.quantity}</p>
-                  <p>€{(product.price * product.quantity).toFixed(2)}</p>
+                  <p>
+                    {product.name} x {product.quantity ?? 1}
+                  </p>
+                  <p>€{(product.price * (product.quantity ?? 1)).toFixed(2)}</p>
                 </div>
               ))
             )}
@@ -67,7 +82,9 @@ const Checkout = () => {
         </div>
       </div>
 
-      <Link href="/cart" className="text-blue-600 block mt-6">Back to Cart</Link>
+      <Link href="/cart" className="text-blue-600 block mt-6">
+        Back to Cart
+      </Link>
     </div>
   );
 };
